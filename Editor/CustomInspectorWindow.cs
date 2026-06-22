@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace _qtLib.Editor
+namespace qtLib.Editor
 {
     public class ObjectInspectorWindow : EditorWindow
     {
