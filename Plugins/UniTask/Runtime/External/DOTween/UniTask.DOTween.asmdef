@@ -1,9 +1,8 @@
 {
-    "name": "qtLib",
-    "rootNamespace": "",
+    "name": "UniTask.DOTween",
     "references": [
         "UniTask",
-        "NaughtyAttributes.Core"
+        "DOTween.Modules"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -12,6 +11,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.demigiant.dotween",
+            "expression": "",
+            "define": "UNITASK_DOTWEEN_SUPPORT"
+        }
+    ],
     "noEngineReferences": false
 }

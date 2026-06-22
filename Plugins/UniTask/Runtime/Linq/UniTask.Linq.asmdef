@@ -1,9 +1,7 @@
 {
-    "name": "qtLib",
-    "rootNamespace": "",
+    "name": "UniTask.Linq",
     "references": [
-        "UniTask",
-        "NaughtyAttributes.Core"
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

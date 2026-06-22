@@ -1,9 +1,11 @@
 {
-    "name": "qtLib",
+    "name": "qtLib.Ads",
     "rootNamespace": "",
     "references": [
-        "UniTask",
-        "NaughtyAttributes.Core"
+        "GUID:85969a9ed6cf6bc4f862263276563f4b",
+        "GUID:776d03a35f1b52c4a9aed9f56d7b4229",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:c3b64dd45358e1746bbbeb02275ef344"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
