@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using qtLib.Game.Object;
-using qtLib.Helper;
 using Random = UnityEngine.Random;
 
 namespace qtLib.Extension
@@ -38,14 +37,18 @@ namespace qtLib.Extension
             return output;
         }
      
-        public static T TakeRandom<T>(this IEnumerable<T> input, Func<T, bool> predicate = null)
+        public static T TakeRandom<T>(this IEnumerable<T> input, Func<T, bool> predicate = null, bool returnEmpty = false)
         {
             List<T> temp;
             if (predicate != null)
             {
                 temp = input.Where(predicate).ToList();
-                if (temp.Count <= 1)
+                if (temp.Count < 1)
                 {
+                    if (returnEmpty)
+                    {
+                        return default;
+                    }
                     throw new ArgumentException("Collection must has at least 1 elements different from the original.");
                 }
             }
