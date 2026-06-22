@@ -1,6 +1,7 @@
 ﻿using System;
 using NaughtyAttributes;
 using qtLib.UI.Base;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -28,6 +29,7 @@ namespace qtLib.Object
         [SerializeField] protected ButtonSetting _buttonSetting;
         private Button _button;
         private Image _image;
+        private TextMeshProUGUI _text;
         private Image[] _imagesInChildren;
         
         [HideInInspector] public Button.ButtonClickedEvent onClick;
@@ -124,11 +126,20 @@ namespace qtLib.Object
 
         public virtual void SetText(string text)
         {
+            if (!_isInitialized)
+            {
+                _Initialize();
+            }
+            _text.SetText(text);
         }
 
         public virtual void SetTextColor(Color color)
         {
-            
+            if (!_isInitialized)
+            {
+                _Initialize();
+            }
+            _text.color = color;
         }
         
         #endregion
@@ -145,6 +156,7 @@ namespace qtLib.Object
             
             _button = GetComponent<Button>();
             _image = GetComponent<Image>();
+            _text = GetComponentInChildren<TextMeshProUGUI>();
             _button.onClick.AddListener(_OnButtonClick);
 
             _imagesInChildren = GetComponentsInChildren<Image>(true);

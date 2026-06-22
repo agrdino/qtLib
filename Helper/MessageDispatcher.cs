@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace qtLib.Helper
 {
-    public class MessageDispatcher : qtSingleton<MessageDispatcher>
+    public partial class MessageDispatcher : qtSingleton<MessageDispatcher>
     {
         public enum EEvent
         {
