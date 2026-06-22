@@ -2,8 +2,9 @@
     "name": "qtLib",
     "rootNamespace": "",
     "references": [
-        "UniTask",
-        "NaughtyAttributes.Core"
+        "qtLib.Ads",
+        "qtLib.IAP",
+        "qtLib.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
