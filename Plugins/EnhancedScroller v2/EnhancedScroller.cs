@@ -1197,7 +1197,7 @@ namespace EnhancedUI.EnhancedScroller
         /// <summary>
         /// The scrollers position
         /// </summary>
-        public float _scrollPosition;
+        private float _scrollPosition;
 
         /// <summary>
         /// The list of cell views that are currently being displayed
