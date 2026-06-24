@@ -97,6 +97,8 @@ namespace qtLib.UI.Base
             _cancellationTokenSource.Dispose();
         }
         
+        public virtual void Close(){}
+        
         private void DoProcessing(CancellationToken token, Action action)
         {
             action?.Invoke();
@@ -240,7 +242,7 @@ namespace qtLib.UI.Base
             return mediator;
         }
 
-        public virtual void ManualHideFromOutSide()
+        public override void Close()
         {
             _ui.ControllerHide();
         }
