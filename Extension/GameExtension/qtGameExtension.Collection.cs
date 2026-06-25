@@ -82,12 +82,22 @@ namespace qtLib.Extension
                 action(element);
         }
 
-        public static List<T> Clone<T>(this IEnumerable<T> enumerable) where T : class, ICloneable<T>
+        public static List<T> Clone<T>(this List<T> list) where T : class, Helper.ICloneable<T>
         {
             List<T> result = new List<T>();
-            foreach (var cloneable in enumerable)
+            foreach (var cloneable in list)
             {
                 result.Add(cloneable.Clone());
+            }
+
+            return result;
+        }
+        public static T[] Clone<T>(this T[] array) where T : class, Helper.ICloneable<T>
+        {
+            T[] result = new T[array.Length];
+            for (var i = 0; i < array.Length; i++)
+            {
+                result[i] = array[i].Clone();
             }
 
             return result;
