@@ -92,6 +92,7 @@ namespace qtLib.Extension
 
             return result;
         }
+      
         public static T[] Clone<T>(this T[] array) where T : class, Helper.ICloneable<T>
         {
             T[] result = new T[array.Length];
@@ -101,6 +102,15 @@ namespace qtLib.Extension
             }
 
             return result;
+        }
+
+        public static T Clone<T>(this T obj) where T : class, Helper.ICloneable<T>
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+            return obj.Clone();
         }
         
         public static void AddRange<TKey, TValue>(this Dictionary<TKey, TValue> dictionary,
