@@ -19,7 +19,7 @@ namespace qtLib.IAP
         {
         }
 
-        public async UniTaskVoid Restore(Action<bool> callback = null)
+        public void Restore(Action<bool> callback = null)
         {
 
         }
@@ -28,7 +28,7 @@ namespace qtLib.IAP
 
         #region ----- Private Function -----
 
-        protected override async void _Init()
+        protected override void _Init()
         {
 
         }
