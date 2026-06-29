@@ -9,10 +9,10 @@ namespace qtLib.UI.Base
             return UniTask.CompletedTask;
         }
 
-        public override async void ControllerHide()
+        public override async UniTaskVoid ControllerHide()
         {
             await uiManager.BeforeUIHide(this);
-            base.ControllerHide();
+            base.ControllerHide().Forget();
         }
 
         protected override UniTask _AnimatedHide()

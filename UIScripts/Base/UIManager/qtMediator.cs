@@ -17,7 +17,7 @@ namespace qtLib.UI.Base
         
         public abstract bool IsActive();
         
-        public async void Move(bool inactivePreviousScene = true, bool setAsLastSibling = true)
+        public async UniTaskVoid Move(bool inactivePreviousScene = true, bool setAsLastSibling = true)
         {
             try
             {
@@ -244,7 +244,7 @@ namespace qtLib.UI.Base
 
         public override void Close()
         {
-            _ui.ControllerHide();
+            _ui.ControllerHide().Forget();
         }
 
         protected virtual void _OnBeforeUIHide()

@@ -103,7 +103,7 @@ namespace qtLib.UI.Base
 
         #region ----- Hide -----
 
-        public virtual async void ControllerHide()
+        public virtual async UniTaskVoid ControllerHide()
         {
             await uiManager.Hide(this, true);
         }
