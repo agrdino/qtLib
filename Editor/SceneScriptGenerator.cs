@@ -1,12 +1,14 @@
+using System;
 using UnityEditor;
 using UnityEngine;
-using qtLib.UI.Base;
 using System.IO;
+using Object = UnityEngine.Object;
 
 public class SceneScriptGenerator : EditorWindow
 {
     private enum ScriptType
     {
+        OverlayScene,
         Scene,
         Popup
     }
@@ -19,6 +21,7 @@ public class SceneScriptGenerator : EditorWindow
 
     private string _sceneBase = "qtScene";
     private string _popupBase = "qtPopup";
+    private string _overlaySceneBase = "qtOverlayScene";
     private string _mediatorBase = "qtMediator";
     private string _requestBase = "qtRequestMediator";
     private string _paramInBase = "ParamInput";
@@ -75,7 +78,7 @@ public class SceneScriptGenerator : EditorWindow
 
             EditorGUILayout.Space(6);
             EditorGUILayout.LabelField("Preview", EditorStyles.boldLabel);
-            _previewScroll = EditorGUILayout.BeginScrollView(_previewScroll, GUILayout.Height(240));
+            _previewScroll = EditorGUILayout.BeginScrollView(_previewScroll, GUILayout.ExpandHeight(true));
             EditorGUILayout.TextArea(_preview, GUILayout.ExpandHeight(true));
             EditorGUILayout.EndScrollView();
 
@@ -91,13 +94,74 @@ public class SceneScriptGenerator : EditorWindow
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private string Suffix() => _type == ScriptType.Scene ? "Scene" : "Popup";
-    private string BaseClass() => _type == ScriptType.Scene ? _sceneBase : _popupBase;
+    private string Suffix()
+    {
+        switch (_type)
+        {
+            case ScriptType.OverlayScene:
+            {
+                return "OverlayScene";
+            }
+            case ScriptType.Scene:
+            {
+                return "Scene";
+            }
+            case ScriptType.Popup:
+            {
+                return "Popup";
+            }
+            default:
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
 
-    private string GetFolder() =>
-        _type == ScriptType.Scene
-            ? $"Assets/_Scripts/UI/Scene/{_name}{Suffix()}"
-            : $"Assets/_Scripts/UI/Popup/{_name}{Suffix()}";
+    private string BaseClass()
+    {
+        switch (_type)
+        {
+            case ScriptType.OverlayScene:
+            {
+                return _overlaySceneBase;
+            }
+            case ScriptType.Scene:
+            {
+                return _sceneBase;
+            }
+            case ScriptType.Popup:
+            {
+                return _popupBase;
+            }
+            default:
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
+
+    private string GetFolder()
+    {
+        switch (_type)
+        {
+            case ScriptType.OverlayScene:
+            {
+                return $"Assets/_Scripts/UI/OverlayPopup/{_name}{Suffix()}";
+            }
+            case ScriptType.Scene:
+            {
+                return $"Assets/_Scripts/UI/Scene/{_name}{Suffix()}";
+            }
+            case ScriptType.Popup:
+            {
+                return $"Assets/_Scripts/UI/Popup/{_name}{Suffix()}";
+            }
+            default:
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
 
     private string MediatorBase()
     {
