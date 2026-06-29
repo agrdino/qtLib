@@ -249,34 +249,6 @@ public class SceneScriptGenerator : EditorWindow
         return sb.ToString();
     }
     
-    private string BuildParamInput()
-    {
-        string cls = _name + Suffix() + "ParamInput";
-        return
-            $@"using qtLib.UI.Base;
-
-namespace UI
-{{
-    public class {cls} : {_paramInBase}
-    {{
-    }}
-}}";
-    }
-
-    private string BuildParamOutput()
-    {
-        string cls = _name + Suffix() + "ParamOutput";
-        return
-            $@"using qtLib.UI.Base;
-
-namespace UI
-{{
-    public class {cls} : {_paramOutBase}
-    {{
-    }}
-}}";
-    }
-
     private string BuildMediator()
     {
         string view = _name + Suffix();
@@ -322,7 +294,7 @@ namespace UI
         sb.AppendLine();
         sb.AppendLine($"    public class {mediator} : {medBase}");
         sb.AppendLine("    {");
-        sb.AppendLine($"       public {mediator}() : base()");
+        sb.AppendLine($"        public {mediator}() : base()");
         sb.AppendLine("        {");
         sb.AppendLine("            _configUI = (ui, logic, mediator) =>");
         sb.AppendLine("            {");
