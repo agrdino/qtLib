@@ -209,7 +209,7 @@ namespace qtLib.UI.Base
                     {
                         qtDebug.Log($"{this} - _addBeforeUIShow");
 #if UNITY_EDITOR && !ENABLE_LOG
-                        Debug.LogError($"{this} - _addBeforeUIShow");
+                        Debug.Log($"{this} - _addBeforeUIShow");
 #endif
                         await _addBeforeUIShow.Invoke(ui, logic, this);
                         _addBeforeUIShow = null;
@@ -219,7 +219,7 @@ namespace qtLib.UI.Base
                     {
                         qtDebug.Log($"{this} - _beforeUIShow");
 #if UNITY_EDITOR && !ENABLE_LOG
-                        Debug.LogError($"{this} - _beforeUIShow");
+                        Debug.Log($"{this} - _beforeUIShow");
 #endif
                         await _beforeUIShow.Invoke(ui, logic, this);
                     }
