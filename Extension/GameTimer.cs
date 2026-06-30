@@ -5,39 +5,76 @@ using UnityEngine;
 
 namespace qtLib.Extension
 {
-    public class GameTimer : qtSingleton<GameTimer>
+    public class GameTimer : qtHiddenSingleton<GameTimer>
     {
+        #region ----- Definition -----
+
+        public enum ETimerType
+        {
+            Time,
+            UnscaledTime,
+            RealtimeSinceStartup,
+        }
+
+        #endregion
+        
         #region ----- Variables -----
 
-        private List<Timer> _timer = new ();
-        private Timer _temp;
+        private static List<Timer> _timer = new ();
+        private static List<Timer> _fixedTimer = new ();
+        private static Timer _temp;
         
-        private bool _isPause;
+        #endregion
+        
+        #region ----- Unity Event -----
+
+        private void Update()
+        {
+            float currentTime = 0;
+            for (var i = 0; i < _timer.Count; i++)
+            {
+                _temp = _timer[i];
+                if (_temp.isPause)
+                {
+                    continue;
+                }
+
+                currentTime = GetTime(_temp.TimerType);
+                if (_temp.isDown)
+                {
+                    if (currentTime >= _temp.time)
+                    {
+                        _temp.completeCallback?.Invoke();
+                        if (_timer.Remove(_temp))
+                        {
+                            i--;
+                        }
+                    }
+                }
+                else
+                {
+                    _temp.updateCallback?.Invoke(currentTime - _temp.time);
+                }
+            }
+        }
 
         #endregion
 
         #region ----- Public Functions -----
 
-        public long RegisterTimer(float time, bool isDown, Action onComplete)
+        public static long RegisterTimer(float time, bool isDown, ETimerType timerType, Action onComplete)
         {
-            return RegisterTimer(time, isDown, null, onComplete);
+            return RegisterTimer(time, isDown, timerType, null, onComplete);
         }
 
-        public long RegisterTimer(float time, bool isDown, Action<float> onUpdate, Action onComplete)
+        public static long RegisterTimer(float time, bool isDown, ETimerType timerType, Action<float> onUpdate, Action onComplete)
         {
             long timerID = DateTime.Now.Ticks;
-            _timer.Add(new Timer()
-            {
-                ID = timerID,
-                time = time,
-                isDown = isDown,
-                updateCallback = onUpdate,
-                completeCallback = onComplete
-            });
+            _timer.Add(new Timer(timerID, GetTime(timerType) + time, isDown, timerType, onUpdate, onComplete));
             return timerID;
         }
 
-        public void PauseTimer(long timerID, bool isPause)
+        public static void PauseTimer(long timerID, bool isPause)
         {
             for (var i = 0; i < _timer.Count; i++)
             {
@@ -47,13 +84,8 @@ namespace qtLib.Extension
                 }
             }
         }
-
-        public void PauseAll(bool isPause)
-        {
-            _isPause = isPause;
-        }
-
-        public void UnRegisterTimer(long timerID)
+        
+        public static void UnRegisterTimer(long timerID)
         {
             for (var i = 0; i < _timer.Count; i++)
             {
@@ -67,38 +99,27 @@ namespace qtLib.Extension
         
         #endregion
 
-        #region ----- Unity Event -----
+        #region ----- Private Functions -----
 
-        private void Update()
+        private static float GetTime(ETimerType timerType)
         {
-            if (_isPause)
+            switch (timerType)
             {
-                return;
-            }
-            for (var i = 0; i < _timer.Count; i++)
-            {
-                _temp = _timer[i];
-                if (_temp.isPause)
+                case ETimerType.Time:
                 {
-                    continue;
+                    return Time.time;
                 }
-
-                if (_temp.isDown)
+                case ETimerType.UnscaledTime:
                 {
-                    _temp.time -= Time.deltaTime;
+                    return Time.unscaledTime;
                 }
-                else
+                case ETimerType.RealtimeSinceStartup:
                 {
-                    _temp.time += Time.deltaTime;
+                    return Time.realtimeSinceStartup;
                 }
-                _temp.updateCallback?.Invoke(_temp.time);
-                if (_temp.time <= 0)
+                default:
                 {
-                    _temp.completeCallback?.Invoke();
-                    if (_timer.Remove(_temp))
-                    {
-                        i--;
-                    }
+                    throw new ArgumentOutOfRangeException(nameof(timerType), timerType, null);
                 }
             }
         }
@@ -107,12 +128,24 @@ namespace qtLib.Extension
 
         private class Timer
         {
-            public long ID;
+            public readonly long ID;
             public bool isPause;
-            public float time;
-            public bool isDown = true;
-            public Action<float> updateCallback;
-            public Action completeCallback;
+            public readonly float time;
+            public readonly ETimerType TimerType = ETimerType.Time;
+            public readonly bool isDown = true;
+            public readonly Action<float> updateCallback;
+            public readonly Action completeCallback;
+
+            public Timer(long id, float time, bool isDown, ETimerType timerType, Action<float> updateCallback, Action completeCallback)
+            {
+                ID = id;
+                isPause = false;
+                this.time = time;
+                this.isDown = isDown;
+                this.TimerType = timerType;
+                this.updateCallback = updateCallback;
+                this.completeCallback = completeCallback;
+            }
         }
     }
 }

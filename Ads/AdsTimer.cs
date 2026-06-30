@@ -31,7 +31,7 @@ namespace qtLib.Ads
                 return FirebaseManager.EErrorCode.OK;
             });
         
-            _adsTimer = GameTimer.Instance.RegisterTimer(_timeBetweenAds, true, OnAdsTimeChanged, OnAdsTimerComplete);
+            _adsTimer = GameTimer.RegisterTimer(_timeBetweenAds, true, OnAdsTimeChanged, OnAdsTimerComplete);
         }
         
         private static void OnAdsTimeChanged(float time)
@@ -47,13 +47,13 @@ namespace qtLib.Ads
         
         public static void Pause(bool isPause)
         {
-            GameTimer.Instance.PauseTimer(_adsTimer, isPause);
+            GameTimer.PauseTimer(_adsTimer, isPause);
         }
         
         public static void ResetTimer()
         {
-            GameTimer.Instance.UnRegisterTimer(_adsTimer);
-            _adsTimer = GameTimer.Instance.RegisterTimer(_timeBetweenAds, true, OnAdsTimeChanged, OnAdsTimerComplete);
+            GameTimer.UnRegisterTimer(_adsTimer);
+            _adsTimer = GameTimer.RegisterTimer(_timeBetweenAds, true, OnAdsTimeChanged, OnAdsTimerComplete);
             _canShowAds = false;
         }
         
@@ -61,8 +61,8 @@ namespace qtLib.Ads
         {
             if (_time <= 0.5f * _timeBetweenAds)
             {
-                GameTimer.Instance.UnRegisterTimer(_adsTimer);
-                _adsTimer = GameTimer.Instance.RegisterTimer(_timeBetweenAds * 0.5f, true, OnAdsTimeChanged, OnAdsTimerComplete);
+                GameTimer.UnRegisterTimer(_adsTimer);
+                _adsTimer = GameTimer.RegisterTimer(_timeBetweenAds * 0.5f, true, OnAdsTimeChanged, OnAdsTimerComplete);
             }
         }
     }

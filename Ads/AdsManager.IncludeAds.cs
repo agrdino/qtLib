@@ -43,7 +43,7 @@ namespace qtLib.Ads
 
         public override UniTask ManualInit()
         {
-            MessageDispatcher.Instance.Register(MessageDispatcher.EEvent.IAPPurchaseSucceeded, _IAPPurchaseSucceeded);
+            MessageDispatcher.Register(MessageDispatcher.EEvent.IAPPurchaseSucceeded, _IAPPurchaseSucceeded);
             _adService.Initialize(_adConfigData, _OnAdReady, _OnAdPaid);
             
             return base.ManualInit();

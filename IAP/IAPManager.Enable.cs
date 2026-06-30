@@ -291,7 +291,7 @@ namespace qtLib.IAP
                 foreach (var purchasedProductInfo in objConfirmedOrder.Info.PurchasedProductInfo)
                 {
                     qtDebug.Log($"IAPManager restore succeeded: {purchasedProductInfo.productId}");
-                    MessageDispatcher.Instance.SendMessage(MessageDispatcher.EEvent.IAPPurchaseSucceeded, new MessageDispatcher.IAPPurchaseSucceededMessage()
+                    MessageDispatcher.SendMessage(MessageDispatcher.EEvent.IAPPurchaseSucceeded, new MessageDispatcher.IAPPurchaseSucceededMessage()
                     {
                         productId = purchasedProductInfo.productId,
                     });
