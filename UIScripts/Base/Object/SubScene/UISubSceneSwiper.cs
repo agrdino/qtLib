@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace qtLib.Extension.UI
+namespace qtLib.UIScripts.Base.Object.SubScene
 {
     public class UISubSceneSwiper : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
@@ -15,25 +15,54 @@ namespace qtLib.Extension.UI
             Vertical
         }
 
-        [Header("UI References")] [SerializeField]
-        private RectTransform viewport;
-
+        [Header("UI References")]
+        [SerializeField] private RectTransform viewport;
         [SerializeField] private RectTransform[] uiObjects;
 
-        [Header("Initial State")] [SerializeField]
-        private int initialIndex = 0;
+        [Header("Initial State")]
+        [SerializeField] private int initialIndex = 0;
 
-        [Header("Swipe Settings")] [SerializeField]
-        private float detectDirectionPixels = 8f;
+        [Header("Swipe Settings")]
+        [SerializeField] private float detectDirectionPixels = 8f;
 
-        [Tooltip("Càng cao thì càng khó bị nhận nhầm swipe ngang khi đang scroll dọc.")] [SerializeField]
-        private float horizontalDominance = 1.1f;
+        [Tooltip("Càng cao thì càng khó bị nhận nhầm swipe ngang khi đang scroll dọc.")]
+        [SerializeField] private float horizontalDominance = 1.1f;
 
         [SerializeField] private float swipeThresholdPercent = 0.2f;
         [SerializeField] private float snapDuration = 0.18f;
 
-        public event Action<int> onSwipeTransitionCompleted;
-        public event Action<int> onSwipeTransitionStarted;
+        /// <summary>
+        /// Bắn khi target scene được SetActive(true).
+        /// Bắn cho cả swipe và GoToIndex.
+        /// Param: fromIndex, toIndex.
+        /// </summary>
+        public event Action<int, int> onNextSubSceneActivated;
+
+        /// <summary>
+        /// Bắn khi previous scene đã bị SetActive(false).
+        /// Bắn cho cả swipe và GoToIndex.
+        /// Param: fromIndex, toIndex.
+        /// </summary>
+        public event Action<int, int> onPreviousSubSceneHidden;
+
+        /// <summary>
+        /// Bắn sau khi chuyển scene hoàn tất.
+        /// Bắn cho cả swipe và GoToIndex.
+        /// Param: fromIndex, toIndex.
+        /// </summary>
+        public event Action<int, int> onTransitionCompleted;
+
+        /// <summary>
+        /// Event cũ để giữ compatibility.
+        /// Bây giờ cũng bắn cho cả swipe và GoToIndex.
+        /// </summary>
+        public event Action<int, int> onSwipeTransitionCompleted;
+
+        /// <summary>
+        /// Event cũ để giữ compatibility.
+        /// Chỉ trả về toIndex.
+        /// </summary>
+        public event Action<int> onActiveNextSubScene;
 
         private int currentIndex;
         private int targetIndex = -1;
@@ -142,14 +171,14 @@ namespace qtLib.Extension.UI
                 RectTransform page = uiObjects[i];
 
                 if (page == null)
+                {
                     continue;
+                }
 
                 page.anchorMin = new Vector2(0f, 0f);
                 page.anchorMax = new Vector2(1f, 1f);
                 page.pivot = new Vector2(0.5f, 0.5f);
 
-                // Width bằng viewport width, height stretch theo parent.
-                // page.sizeDelta = new Vector2(screenWidth, 0f);
                 page.anchoredPosition = new Vector2(page.anchoredPosition.x, 0f);
             }
         }
@@ -165,6 +194,10 @@ namespace qtLib.Extension.UI
             currentIndex = Mathf.Clamp(currentIndex, 0, uiObjects.Length - 1);
         }
 
+        /// <summary>
+        /// Reset visual.
+        /// Không notify trong function này để tránh bắn sai lúc Awake, OnEnable, BeginDrag, swipe fail.
+        /// </summary>
         private void ShowOnlyCurrent()
         {
             if (uiObjects == null || uiObjects.Length == 0)
@@ -180,16 +213,66 @@ namespace qtLib.Extension.UI
                 RectTransform page = uiObjects[i];
 
                 if (page == null)
+                {
                     continue;
+                }
 
-                bool active = i == currentIndex;
-
-                page.gameObject.SetActive(active);
+                page.gameObject.SetActive(i == currentIndex);
                 SetPageX(i, 0f);
             }
         }
 
-        // Drag trực tiếp trên viewport.
+        /// <summary>
+        /// Dùng sau khi transition thành công.
+        /// Notify đúng lúc previous scene bị hide.
+        /// </summary>
+        private void ShowCurrentAndHidePrevious(
+            int previousIndex,
+            int newIndex,
+            bool notifyPreviousHidden
+        )
+        {
+            if (uiObjects == null || uiObjects.Length == 0)
+            {
+                return;
+            }
+
+            targetIndex = -1;
+            targetOffset = 0;
+
+            for (int i = 0; i < uiObjects.Length; i++)
+            {
+                RectTransform page = uiObjects[i];
+
+                if (page == null)
+                {
+                    continue;
+                }
+
+                if (i == newIndex)
+                {
+                    page.gameObject.SetActive(true);
+                    SetPageX(i, 0f);
+                    continue;
+                }
+
+                bool wasActive = page.gameObject.activeSelf;
+
+                page.gameObject.SetActive(false);
+                SetPageX(i, 0f);
+
+                if (
+                    notifyPreviousHidden &&
+                    i == previousIndex &&
+                    previousIndex != newIndex &&
+                    wasActive
+                )
+                {
+                    NotifyPreviousSubSceneHidden(previousIndex, newIndex);
+                }
+            }
+        }
+
         public void OnBeginDrag(PointerEventData eventData)
         {
             BeginDragInternal(eventData);
@@ -205,7 +288,6 @@ namespace qtLib.Extension.UI
             EndDragInternal(eventData);
         }
 
-        // Drag được forward từ ScrollView con.
         public void ForwardBeginDrag(PointerEventData eventData)
         {
             BeginDragInternal(eventData);
@@ -261,14 +343,11 @@ namespace qtLib.Extension.UI
 
             ResolveDragMode(delta);
 
-            // Nếu đang scroll dọc trong ScrollView con thì không move page.
             if (dragMode != DragMode.Horizontal)
             {
                 return;
             }
 
-            // Khi tay quay gần về điểm bắt đầu, bỏ target cũ.
-            // Nhờ vậy kéo qua phải xong kéo ngược qua trái vẫn đổi hướng được.
             if (Mathf.Abs(delta.x) < detectDirectionPixels)
             {
                 ClearTargetPreview();
@@ -277,7 +356,7 @@ namespace qtLib.Extension.UI
 
             int desiredOffset = delta.x < 0f ? +1 : -1;
 
-            if (!TryActivateTarget(desiredOffset))
+            if (!TryActivateTarget(desiredOffset, notifyActivated: true))
             {
                 SetPageX(currentIndex, 0f);
                 return;
@@ -319,7 +398,7 @@ namespace qtLib.Extension.UI
 
             int desiredOffset = delta.x < 0f ? +1 : -1;
 
-            if (!TryActivateTarget(desiredOffset))
+            if (!TryActivateTarget(desiredOffset, notifyActivated: true))
             {
                 dragMode = DragMode.None;
                 ShowOnlyCurrent();
@@ -338,7 +417,8 @@ namespace qtLib.Extension.UI
 
             StartSnap(
                 shouldSwitch: shouldSwitch,
-                notifyWhenCompleted: true
+                notifyTransitionCompleted: true,
+                notifyPreviousHidden: true
             );
         }
 
@@ -370,7 +450,7 @@ namespace qtLib.Extension.UI
             }
         }
 
-        private bool TryActivateTarget(int desiredOffset)
+        private bool TryActivateTarget(int desiredOffset, bool notifyActivated)
         {
             int desiredIndex = currentIndex + desiredOffset;
 
@@ -385,18 +465,20 @@ namespace qtLib.Extension.UI
                 return true;
             }
 
-            // Đổi hướng trong cùng một lần drag:
-            // tắt target cũ, bật target mới.
             ClearTargetPreview();
 
             targetOffset = desiredOffset;
             targetIndex = desiredIndex;
 
-            onSwipeTransitionStarted?.Invoke(targetIndex);
-            uiObjects[targetIndex].gameObject.SetActive(true);
-
             SetPageX(currentIndex, 0f);
+
+            uiObjects[targetIndex].gameObject.SetActive(true);
             SetPageX(targetIndex, targetOffset * screenWidth);
+
+            if (notifyActivated)
+            {
+                NotifyNextSubSceneActivated(currentIndex, targetIndex);
+            }
 
             return true;
         }
@@ -405,6 +487,8 @@ namespace qtLib.Extension.UI
         {
             if (IsValidIndex(targetIndex) && targetIndex != currentIndex)
             {
+                // Đây chỉ là target preview bị tắt.
+                // Không gọi onPreviousSubSceneHidden ở đây.
                 uiObjects[targetIndex].gameObject.SetActive(false);
                 SetPageX(targetIndex, 0f);
             }
@@ -422,20 +506,22 @@ namespace qtLib.Extension.UI
         {
             if (targetOffset == +1)
             {
-                // Target ở bên phải, kéo từ 0 tới -screenWidth.
                 return Mathf.Clamp(deltaX, -screenWidth, 0f);
             }
 
             if (targetOffset == -1)
             {
-                // Target ở bên trái, kéo từ 0 tới +screenWidth.
                 return Mathf.Clamp(deltaX, 0f, screenWidth);
             }
 
             return 0f;
         }
 
-        private void StartSnap(bool shouldSwitch, bool notifyWhenCompleted)
+        private void StartSnap(
+            bool shouldSwitch,
+            bool notifyTransitionCompleted,
+            bool notifyPreviousHidden
+        )
         {
             if (!IsValidIndex(currentIndex) || !IsValidIndex(targetIndex))
             {
@@ -450,7 +536,8 @@ namespace qtLib.Extension.UI
                 toIndex: targetIndex,
                 offset: targetOffset,
                 shouldSwitch: shouldSwitch,
-                notifyWhenCompleted: notifyWhenCompleted,
+                notifyTransitionCompleted: notifyTransitionCompleted,
+                notifyPreviousHidden: notifyPreviousHidden,
                 cts: cts
             ).Forget();
         }
@@ -460,11 +547,12 @@ namespace qtLib.Extension.UI
             int toIndex,
             int offset,
             bool shouldSwitch,
-            bool notifyWhenCompleted,
+            bool notifyTransitionCompleted,
+            bool notifyPreviousHidden,
             CancellationTokenSource cts
         )
         {
-            bool shouldNotifyAfterCleanup = false;
+            bool shouldNotifyTransitionCompletedAfterCleanup = false;
             int notifyFromIndex = -1;
             int notifyToIndex = -1;
 
@@ -538,13 +626,21 @@ namespace qtLib.Extension.UI
                 if (shouldSwitch)
                 {
                     currentIndex = toIndex;
+
+                    ShowCurrentAndHidePrevious(
+                        previousIndex: oldIndex,
+                        newIndex: currentIndex,
+                        notifyPreviousHidden: notifyPreviousHidden
+                    );
+                }
+                else
+                {
+                    ShowOnlyCurrent();
                 }
 
-                ShowOnlyCurrent();
-
-                if (shouldSwitch && notifyWhenCompleted && oldIndex != currentIndex)
+                if (shouldSwitch && notifyTransitionCompleted && oldIndex != currentIndex)
                 {
-                    shouldNotifyAfterCleanup = true;
+                    shouldNotifyTransitionCompletedAfterCleanup = true;
                     notifyFromIndex = oldIndex;
                     notifyToIndex = currentIndex;
                 }
@@ -564,9 +660,9 @@ namespace qtLib.Extension.UI
                 cts.Dispose();
             }
 
-            if (shouldNotifyAfterCleanup)
+            if (shouldNotifyTransitionCompletedAfterCleanup)
             {
-                NotifySwipeTransitionCompleted(notifyFromIndex, notifyToIndex);
+                NotifyTransitionCompleted(notifyFromIndex, notifyToIndex);
             }
         }
 
@@ -603,15 +699,41 @@ namespace qtLib.Extension.UI
             isAnimating = false;
         }
 
-        private void NotifySwipeTransitionCompleted(int fromIndex, int toIndex)
+        private void NotifyNextSubSceneActivated(int fromIndex, int toIndex)
         {
             if (fromIndex == toIndex)
             {
                 return;
             }
 
-            onSwipeTransitionCompleted?.Invoke(toIndex);
-            // OnSwipeTransitionCompleted?.Invoke(fromIndex, toIndex);
+            onNextSubSceneActivated?.Invoke(fromIndex, toIndex);
+
+            // Event cũ.
+            onActiveNextSubScene?.Invoke(toIndex);
+        }
+
+        private void NotifyPreviousSubSceneHidden(int fromIndex, int toIndex)
+        {
+            if (fromIndex == toIndex)
+            {
+                return;
+            }
+
+            onPreviousSubSceneHidden?.Invoke(fromIndex, toIndex);
+        }
+
+        private void NotifyTransitionCompleted(int fromIndex, int toIndex)
+        {
+            if (fromIndex == toIndex)
+            {
+                return;
+            }
+
+            onTransitionCompleted?.Invoke(fromIndex, toIndex);
+
+            // Event cũ.
+            // Tên là swipe, nhưng giờ cũng notify cho GoToIndex để không break code cũ.
+            onSwipeTransitionCompleted?.Invoke(fromIndex, toIndex);
         }
 
         private void SetPageX(int index, float x)
@@ -649,9 +771,19 @@ namespace qtLib.Extension.UI
                    && index < uiObjects.Length
                    && uiObjects[index] != null;
         }
-        
-        // Manual GoToIndex có animation, nhưng KHÔNG notify.
+
         public void GoToIndex(int index)
+        {
+            GoToIndex(index, true);
+        }
+
+        /// <summary>
+        /// Manual GoToIndex cũng notify:
+        /// 1. onNextSubSceneActivated
+        /// 2. onPreviousSubSceneHidden
+        /// 3. onTransitionCompleted / onSwipeTransitionCompleted
+        /// </summary>
+        public void GoToIndex(int index, bool animated)
         {
             if (uiObjects == null || uiObjects.Length == 0)
             {
@@ -679,22 +811,38 @@ namespace qtLib.Extension.UI
                 return;
             }
 
-            ShowOnlyCurrent();
-            
-            targetIndex = newIndex;
+            int oldIndex = currentIndex;
 
-            // Index lớn hơn: target nằm bên phải, trượt sang trái.
-            // Index nhỏ hơn: target nằm bên trái, trượt sang phải.
+            ShowOnlyCurrent();
+
+            targetIndex = newIndex;
             targetOffset = targetIndex > currentIndex ? +1 : -1;
 
-            uiObjects[targetIndex].gameObject.SetActive(true);
-
             SetPageX(currentIndex, 0f);
+
+            uiObjects[targetIndex].gameObject.SetActive(true);
             SetPageX(targetIndex, targetOffset * screenWidth);
+
+            NotifyNextSubSceneActivated(oldIndex, targetIndex);
+
+            if (!animated)
+            {
+                currentIndex = targetIndex;
+
+                ShowCurrentAndHidePrevious(
+                    previousIndex: oldIndex,
+                    newIndex: currentIndex,
+                    notifyPreviousHidden: true
+                );
+
+                NotifyTransitionCompleted(oldIndex, currentIndex);
+                return;
+            }
 
             StartSnap(
                 shouldSwitch: true,
-                notifyWhenCompleted: false
+                notifyTransitionCompleted: true,
+                notifyPreviousHidden: true
             );
         }
 
