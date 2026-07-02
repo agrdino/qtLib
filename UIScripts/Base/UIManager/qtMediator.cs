@@ -230,7 +230,7 @@ namespace qtLib.UI.Base
                 try
                 {
                     result.data = await transition.Move(inactivePreviousScene, _param, setAsLastSibling);
-                    result.isSuccess = false;
+                    result.isSuccess = true;
                 }
                 catch (Exception e)
                 {
@@ -238,7 +238,7 @@ namespace qtLib.UI.Base
 #if UNITY_EDITOR && !ENABLE_LOG
                     Debug.LogError(e.Message);
 #endif
-                    result.isSuccess = true;
+                    result.isSuccess = false;
                     throw;
                 }
 
@@ -248,8 +248,8 @@ namespace qtLib.UI.Base
         
         protected virtual async UniTask<(TUI, TLogic)> Show(bool inactivePreviousScene = true, bool setAsLastSibling = true)
         {
-            var (isCancel, mediator) = await Load(inactivePreviousScene, setAsLastSibling);
-            if (isCancel)
+            var (isSuccess, mediator) = await Load(inactivePreviousScene, setAsLastSibling);
+            if (!isSuccess)
             {
                 throw new OperationCanceledException();
             }

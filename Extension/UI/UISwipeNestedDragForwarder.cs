@@ -1,5 +1,4 @@
-﻿using _Scripts.UI.Scene.MenuScene;
-using qtLib.UIScripts.Base.Object.SubScene;
+﻿using qtLib.UIScripts.Base.Object.SubScene;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
