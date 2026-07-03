@@ -24,13 +24,13 @@
         {
         }
 
-        public virtual void Show()
+        public void Show()
         {
             ConfigUI();
             BeforeUIShow();
         }
 
-        public virtual void Hide()
+        public void Hide()
         {
             RemoveEvent();
         }
