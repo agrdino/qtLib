@@ -2,14 +2,14 @@
 
 namespace qtLib.Extension.Camera
 {
+    [RequireComponent(typeof(UnityEngine.Camera))]
     public class CameraYSortSetup : MonoBehaviour
     {
-        [SerializeField] private UnityEngine.Camera _camera;
-
         private void Awake()
         {
-            _camera.transparencySortMode = TransparencySortMode.CustomAxis;
-            _camera.transparencySortAxis = Vector3.up;
+            UnityEngine.Camera camera = GetComponent<UnityEngine.Camera>(); 
+            camera.transparencySortMode = TransparencySortMode.CustomAxis;
+            camera.transparencySortAxis = Vector3.up;
         }
     }
 }
