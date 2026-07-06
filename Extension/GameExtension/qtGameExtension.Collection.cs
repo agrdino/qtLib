@@ -87,7 +87,7 @@ namespace qtLib.Extension
             List<T> result = new List<T>();
             foreach (var cloneable in list)
             {
-                result.Add(cloneable.Clone());
+                result.Add(qtGameExtension.Clone(cloneable));
             }
 
             return result;
