@@ -31,6 +31,10 @@ namespace qtLib.UIScripts.Base.Object.SubScene
         [SerializeField] private float swipeThresholdPercent = 0.2f;
         [SerializeField] private float snapDuration = 0.18f;
 
+        [Header("Click Guard")]
+        [Tooltip("Khi bắt đầu drag/swipe, hủy pending click để tránh trigger Button/action lúc thả tay.")]
+        [SerializeField] private bool cancelClickAfterDrag = true;
+
         /// <summary>
         /// Bắn khi target subscene được SetActive(true).
         /// Bắn cho cả swipe và GoToIndex.
@@ -52,12 +56,11 @@ namespace qtLib.UIScripts.Base.Object.SubScene
         /// </summary>
         public event Action<int, int> onTransitionCompleted;
 
-        
         private int currentIndex;
         private int targetIndex = -1;
 
-        // +1 = target nằm bên phải current.
-        // -1 = target nằm bên trái current.
+        // +1 = target nằm bên phải current, user kéo trái.
+        // -1 = target nằm bên trái current, user kéo phải.
         private int targetOffset = 0;
 
         private float screenWidth;
@@ -300,8 +303,19 @@ namespace qtLib.UIScripts.Base.Object.SubScene
             EndDragInternal(eventData);
         }
 
+        /// <summary>
+        /// Dùng khi ScrollView con đã xác định là vertical drag.
+        /// Hủy state swipe đã begin nhưng không trigger transition.
+        /// </summary>
+        public void ForwardCancelDrag()
+        {
+            CancelDragInternal();
+        }
+
         private void BeginDragInternal(PointerEventData eventData)
         {
+            CancelPendingClick(eventData);
+
             // Đang transition thì không cho user swipe cắt ngang.
             if (IsTransitioning)
             {
@@ -334,6 +348,8 @@ namespace qtLib.UIScripts.Base.Object.SubScene
 
         private void DragInternal(PointerEventData eventData)
         {
+            CancelPendingClick(eventData);
+
             if (!isDragging)
             {
                 return;
@@ -354,14 +370,14 @@ namespace qtLib.UIScripts.Base.Object.SubScene
 
             ResolveDragMode(delta);
 
-            // Nếu đang scroll dọc trong ScrollView con thì không move page.
+            // Đã detect vertical thì không ghi nhận horizontal swipe nữa.
             if (dragMode != DragMode.Horizontal)
             {
                 return;
             }
 
-            // Khi tay quay gần về điểm bắt đầu, bỏ target cũ.
-            // Nhờ vậy kéo qua phải xong kéo ngược qua trái vẫn đổi hướng được.
+            // Horizontal đã được lock theo trục,
+            // nhưng vẫn cho đổi chiều trái/phải trong cùng một lần drag.
             if (Mathf.Abs(delta.x) < detectDirectionPixels)
             {
                 ClearTargetPreview();
@@ -384,6 +400,8 @@ namespace qtLib.UIScripts.Base.Object.SubScene
 
         private void EndDragInternal(PointerEventData eventData)
         {
+            CancelPendingClick(eventData);
+
             if (!isDragging)
             {
                 return;
@@ -403,6 +421,8 @@ namespace qtLib.UIScripts.Base.Object.SubScene
 
             ResolveDragMode(delta);
 
+            // Chỉ horizontal mới được xử lý page swipe.
+            // Vertical hoặc None thì reset, không trigger transition.
             if (dragMode != DragMode.Horizontal)
             {
                 dragMode = DragMode.None;
@@ -417,6 +437,8 @@ namespace qtLib.UIScripts.Base.Object.SubScene
                 return;
             }
 
+            // Lấy chiều cuối cùng lúc thả tay.
+            // User kéo trái rồi đổi sang phải thì kết quả cuối là phải.
             int desiredOffset = delta.x < 0f ? +1 : -1;
 
             if (!TryActivateTarget(desiredOffset, notifyActivated: true))
@@ -443,8 +465,32 @@ namespace qtLib.UIScripts.Base.Object.SubScene
             );
         }
 
+        private void CancelDragInternal()
+        {
+            if (!isDragging)
+            {
+                return;
+            }
+
+            if (IsTransitioning)
+            {
+                isDragging = false;
+                dragMode = DragMode.None;
+                return;
+            }
+
+            isDragging = false;
+            dragMode = DragMode.None;
+
+            ClearTargetPreview();
+            ShowOnlyCurrent();
+        }
+
         private void ResolveDragMode(Vector2 delta)
         {
+            // Đã xác định trục rồi thì khóa luôn trong lần drag này.
+            // Horizontal không đổi thành Vertical.
+            // Vertical không đổi thành Horizontal.
             if (dragMode != DragMode.None)
             {
                 return;
@@ -486,8 +532,8 @@ namespace qtLib.UIScripts.Base.Object.SubScene
                 return true;
             }
 
-            // Đổi hướng trong cùng một lần drag:
-            // tắt target cũ, bật target mới.
+            // Cho phép đổi chiều trong Horizontal:
+            // target cũ bị tắt, target mới được bật.
             ClearTargetPreview();
 
             targetOffset = desiredOffset;
@@ -764,6 +810,33 @@ namespace qtLib.UIScripts.Base.Object.SubScene
             onTransitionCompleted?.Invoke(fromIndex, toIndex);
         }
 
+        private void CancelPendingClick(PointerEventData eventData)
+        {
+            if (!cancelClickAfterDrag)
+            {
+                return;
+            }
+
+            if (eventData == null)
+            {
+                return;
+            }
+
+            // Chặn click ở cấp EventSystem.
+            // Quan trọng: phải clear từ BeginDrag/Drag, không chỉ EndDrag,
+            // vì một số EventSystem xử lý PointerClick trước EndDrag khi thả tay.
+            eventData.eligibleForClick = false;
+            eventData.pointerPress = null;
+            eventData.rawPointerPress = null;
+            eventData.clickCount = 0;
+            eventData.clickTime = 0f;
+
+            if (EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+            }
+        }
+
         private void SetPageX(int index, float x)
         {
             if (!IsValidIndex(index))
@@ -809,7 +882,7 @@ namespace qtLib.UIScripts.Base.Object.SubScene
         /// Manual GoToIndex cũng notify:
         /// 1. onNextSubSceneActivated
         /// 2. onPreviousSubSceneHidden
-        /// 3. onTransitionCompleted / onSwipeTransitionCompleted
+        /// 3. onTransitionCompleted
         ///
         /// User swipe bị block khi đang transition,
         /// nhưng GoToIndex bằng code vẫn được phép override transition hiện tại.
