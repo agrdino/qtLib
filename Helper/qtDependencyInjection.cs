@@ -154,7 +154,7 @@ namespace qtLib.Helper
         {
             if (Instance != this)
             {
-                DestroyImmediate(gameObject);
+                Destroy(gameObject);
                 return;
             }
 
