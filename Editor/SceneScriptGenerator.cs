@@ -244,15 +244,27 @@ public class SceneScriptGenerator : EditorWindow
         sb.AppendLine($"    public class {cls} : {b}");
         sb.AppendLine("    {");
         sb.AppendLine("        #region ----- Component Config -----");
+        sb.AppendLine();
+        sb.AppendLine();
+        sb.AppendLine();
         sb.AppendLine("        #endregion");
         sb.AppendLine();
         sb.AppendLine("        #region ----- Properties -----");
+        sb.AppendLine();
+        sb.AppendLine();
+        sb.AppendLine();
         sb.AppendLine("        #endregion");
         sb.AppendLine();
         sb.AppendLine("        #region ----- Public Functions -----");
+        sb.AppendLine();
+        sb.AppendLine();
+        sb.AppendLine();
         sb.AppendLine("        #endregion");
         sb.AppendLine();
         sb.AppendLine("        #region ----- Private Functions -----");
+        sb.AppendLine();
+        sb.AppendLine();
+        sb.AppendLine();
         sb.AppendLine("        #endregion");
         sb.AppendLine("    }");
         sb.Append("}");
@@ -332,11 +344,17 @@ public class SceneScriptGenerator : EditorWindow
         sb.AppendLine("        }");
         sb.AppendLine();
         sb.AppendLine("        #region ----- Button Events -----");
+        sb.AppendLine();
+        sb.AppendLine();
+        sb.AppendLine();
         sb.AppendLine("        #endregion");
         sb.AppendLine();
         sb.AppendLine("        #region ----- Private Functions -----");
+        sb.AppendLine();
+        sb.AppendLine();
+        sb.AppendLine();
         sb.AppendLine("        #endregion");
-
+        sb.AppendLine();
         if (_hasInput)
         {
             sb.AppendLine($"        public override UniTask<{paramIn}> RequestData()");
