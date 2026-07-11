@@ -1,4 +1,4 @@
-using qtLib.UI.Base;
+using qtLib.UI.UIManager;
 
 namespace _Scripts.UI.Popup.LoadingPopup
 {

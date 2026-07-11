@@ -1,4 +1,4 @@
-﻿using qtLib.UIScripts.Base.Object.SubScene;
+﻿using qtLib.UI.SubScene;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
