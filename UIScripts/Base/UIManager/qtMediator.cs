@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using qtLib.Helper;
-using UnityEngine;
 
 namespace qtLib.UI.Base
 {
@@ -417,7 +416,7 @@ namespace qtLib.UI.Base
         }
     }
 
-    public abstract class qtRequestMediator<TUI, TLogic, TArgs> : qtMediator<TUI, TLogic>, IMRequestData<TArgs>
+    public abstract class qtMediator<TUI, TLogic, TArgs> : qtMediator<TUI, TLogic>, IMRequestData<TArgs>
         where TArgs : class
         where TUI : qtUiObject
         where TLogic : qtLogic,
@@ -453,6 +452,6 @@ namespace qtLib.UI.Base
 
     public interface IMRequestData<TData>
     {
-        UniTask<TData> RequestData();
+        public UniTask<TData> RequestData();
     }
 }
