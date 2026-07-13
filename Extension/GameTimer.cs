@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using qtLib.Helper;
 using UnityEngine;
 
 namespace qtLib.Extension
 {
-    public class GameTimer : qtHiddenSingleton<GameTimer>
+    public class GameTimer : MonoBehaviour
     {
         #region ----- Definition -----
 

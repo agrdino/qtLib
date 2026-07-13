@@ -40,15 +40,20 @@ namespace qtLib.UI.UIManager
         [SerializeField] protected AnimationConfig _animationConfig = new AnimationConfig();
 
         // Legacy names are intentionally preserved to avoid breaking existing UI scripts.
-        public object parameter { get; protected set; }
+        protected object _parameter;
         public UniTaskCompletionSource<ParamOutput> uiResult = new UniTaskCompletionSource<ParamOutput>();
-        public bool isActive { get; protected set; }
+        protected bool _isActive;
 
+        protected RectTransform _rectCanvas
+        {
+            get;
+            private set;
+        }
         public float animInTime => Animation.animInTime;
         public float animOutTime => Animation.animOutTime;
 
-        public object Parameter => parameter;
-        public bool IsActive => isActive;
+        public object Parameter => _parameter;
+        public bool IsActive => _isActive;
         public CancellationToken ViewCancellationToken =>
             destroyCancellationToken != null ? destroyCancellationToken.Token : CancellationToken.None;
 
@@ -69,17 +74,18 @@ namespace qtLib.UI.UIManager
 
         private bool _isPreparedForShow;
 
-        public virtual void PreInit()
+        public virtual void PreInit(RectTransform rectCanvas)
         {
             RenewViewCancellationToken();
             RenewResultSource();
             _isPreparedForShow = false;
-            isActive = false;
+            _isActive = false;
+            _rectCanvas = rectCanvas;
         }
 
         internal void PrepareForShow(object param)
         {
-            parameter = param;
+            _parameter = param;
 
             if (_isPreparedForShow)
             {
@@ -107,7 +113,7 @@ namespace qtLib.UI.UIManager
             _isPreparedForShow = false;
 
             gameObject.SetActive(true);
-            isActive = true;
+            _isActive = true;
 
             try
             {
@@ -125,7 +131,7 @@ namespace qtLib.UI.UIManager
             }
             catch
             {
-                isActive = false;
+                _isActive = false;
                 uiResult?.TrySetCanceled();
 
                 if (this != null && gameObject != null)
@@ -170,17 +176,14 @@ namespace qtLib.UI.UIManager
                 return;
             }
 
-            if (this is qtScene)
-            {
-                await _BeforeHide();
-                gameObject.SetActive(false);
+            await _BeforeHide();
+            gameObject.SetActive(false);
 
-                // A close without an explicit output should still release result waiters.
-                // Explicit results submitted by a hide callback win because TrySetResult
-                // simply returns false once the source has already completed.
-            }
+            // A close without an explicit output should still release result waiters.
+            // Explicit results submitted by a hide callback win because TrySetResult
+            // simply returns false once the source has already completed.
 
-            isActive = false;
+            _isActive = false;
             RenewViewCancellationToken();
         }
 

@@ -23,15 +23,15 @@ namespace qtLib.UI.UIManager
         }
     }
 
-    public abstract class qtLogic<T> : qtLogic
+    public abstract class qtLogic<TArgs> : qtLogic
     {
-        public T Args => (T)param;
+        protected TArgs _args => (TArgs)param;
 
         public qtLogic()
         {
         }
 
-        public qtLogic(T param)
+        public qtLogic(TArgs param)
         {
             this.param = param;
         }

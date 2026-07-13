@@ -79,7 +79,7 @@ namespace qtLib.UI.UIManager
                     return;
                 }
 
-                var operation = GetOrStartSharedMove();
+                var operation = GetOrStartSharedMove<NoOutput>();
 
                 await operation.ShowCompletionSource.Task;
             }
@@ -106,7 +106,7 @@ namespace qtLib.UI.UIManager
                     return null;
                 }
 
-                var operation = GetOrStartSharedMove();
+                var operation = GetOrStartSharedMove<ParamOutput>();
 
                 var result = await operation.ResultCompletionSource.Task;
                 if (result == null)
@@ -190,7 +190,7 @@ namespace qtLib.UI.UIManager
 
         protected abstract void RemoveEvent();
 
-        private MoveOperation GetOrStartSharedMove()
+        private MoveOperation GetOrStartSharedMove<TOutPut>() where TOutPut : ParamOutput, new()
         {
             MoveOperation operation;
             var shouldStart = false;
@@ -215,19 +215,19 @@ namespace qtLib.UI.UIManager
             // synchronously, and completion also needs the same gate.
             if (shouldStart)
             {
-                ExecuteSharedMove(operation).Forget();
+                ExecuteSharedMove<TOutPut>(operation).Forget();
             }
 
             return operation;
         }
 
-        private async UniTask ExecuteSharedMove(MoveOperation operation)
+        private async UniTask ExecuteSharedMove<TOutPut>(MoveOperation operation) where TOutPut : ParamOutput, new()
         {
             try
             {
                 // Always run a result-capable operation. Move()/MoveAsync() is released
                 // earlier by CompleteSharedShow(), while Move<TOutput>() can keep waiting.
-                var result = await WorkingForResult<ParamOutput>();
+                var result = await WorkingForResult<TOutPut>();
 
                 // Fallback for a custom mediator override that does not explicitly call
                 // CompleteSharedShow().
@@ -322,12 +322,7 @@ namespace qtLib.UI.UIManager
             TUI ui,
             TLogic logic,
             qtMediator<TUI, TLogic> mediator);
-
-        public delegate UniTask<ParamOutput> fncResult_VLM(
-            TUI ui,
-            TLogic logic,
-            qtMediator<TUI, TLogic> mediator);
-
+        
         protected fncVLM _configUI;
         protected fncVLM _beforeUIShow;
         protected fncVLM _afterUIShow;
@@ -769,8 +764,11 @@ namespace qtLib.UI.UIManager
             // through SetParam(). ConfigUI receives the returned fresh data afterwards.
             // Duplicate clicks join the existing shared operation and never execute this
             // hook a second time.
-            var requestedData = await RequestData();
-            _param = requestedData;
+            if (_param == null)
+            {
+                var requestedData = await RequestData();
+                _param = requestedData;
+            }
         }
     }
 

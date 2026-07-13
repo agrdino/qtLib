@@ -91,57 +91,48 @@ namespace qtLib.UI.UIManager
             _session?.Clear();
             ResetBusyCounter();
         }
-
-        /// <summary>
-        /// Returns the newest reusable mediator. A mediator whose request is still
-        /// running is always reused, so repeated clicks join its shared Move operation.
-        /// </summary>
-        public static TMediator Request<TMediator>(bool needRequestNewData = false)
-            where TMediator : qtMediator
-        {
-            return Request<TMediator>(
-                needRequestNewData,
-                allowDuplicate: false);
-        }
+        //
+        // /// <summary>
+        // /// Returns the newest reusable mediator. A mediator whose request is still
+        // /// running is always reused, so repeated clicks join its shared Move operation.
+        // /// </summary>
+        // public static TMediator Request<TMediator>()
+        //     where TMediator : qtMediator
+        // {
+        //     return Request<TMediator>();
+        // }
 
         /// <summary>
         /// Set allowDuplicate only for a flow that intentionally supports concurrent
         /// instances of the same mediator/UI type.
         /// </summary>
-        public static TMediator Request<TMediator>(
-            bool needRequestNewData,
-            bool allowDuplicate)
+        public static TMediator Request<TMediator>()
             where TMediator : qtMediator
         {
             var uiFlow = RequireInstance();
-            var mediator = uiFlow.GetOrAdd<TMediator>(
-                needRequestNewData,
-                allowDuplicate);
+            var mediator = uiFlow.GetOrAdd<TMediator>();
 
             uiFlow._session ??= new CurrentSession();
             uiFlow._session.Add(mediator);
             return mediator;
         }
 
-        /// <summary>
-        /// Explicit escape hatch for screens that really need another concurrent
-        /// instance of the same mediator/UI type.
-        /// </summary>
-        public static TMediator RequestNew<TMediator>(bool needRequestNewData = true)
-            where TMediator : qtMediator
-        {
-            return Request<TMediator>(
-                needRequestNewData,
-                allowDuplicate: true);
-        }
+        // /// <summary>
+        // /// Explicit escape hatch for screens that really need another concurrent
+        // /// instance of the same mediator/UI type.
+        // /// </summary>
+        // public static TMediator RequestNew<TMediator>(bool needRequestNewData = true)
+        //     where TMediator : qtMediator
+        // {
+        //     return Request<TMediator>(true);
+        // }
 
         /// <summary>
         /// Button-handler friendly request. It rejects the action when another UI
         /// transition is busy or when the same mediator is already active/pending.
         /// </summary>
         public static bool TryRequest<TMediator>(
-            out TMediator mediator,
-            bool needRequestNewData = false)
+            out TMediator mediator)
             where TMediator : qtMediator
         {
             mediator = null;
@@ -159,9 +150,7 @@ namespace qtLib.UI.UIManager
                 return false;
             }
 
-            mediator = uiFlow.GetOrAdd<TMediator>(
-                needRequestNewData,
-                allowDuplicate: false);
+            mediator = uiFlow.GetOrAdd<TMediator>();
 
             uiFlow._session ??= new CurrentSession();
             uiFlow._session.Add(mediator);
@@ -232,24 +221,17 @@ namespace qtLib.UI.UIManager
             PublishRaycastBlockState();
         }
 
-        private TMediator GetOrAdd<TMediator>(
-            bool needRequestNewData,
-            bool allowDuplicate)
+        private TMediator GetOrAdd<TMediator>()
             where TMediator : qtMediator
         {
             var mediator = Get<TMediator>();
 
-            if (!allowDuplicate && mediator != null)
+            if (mediator != null)
             {
                 // Check the in-flight request before IsActive. The UI GameObject is
                 // enabled before show animation completes, so IsActive alone is not a
                 // safe double-click guard.
                 if (mediator.IsRequestInProgress || mediator.IsActive())
-                {
-                    return mediator;
-                }
-
-                if (!needRequestNewData)
                 {
                     return mediator;
                 }

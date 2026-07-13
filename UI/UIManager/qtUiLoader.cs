@@ -8,6 +8,8 @@ namespace qtLib.UI.UIManager
 {
     public abstract partial class qtUiLoader<TUI> : qtUiLoader where TUI : qtUiObject
     {
+        protected RectTransform _rectCanvas;
+        
         private readonly Dictionary<string, TUI> _uiElements = new Dictionary<string, TUI>();
         private readonly Dictionary<string, TUI> _loadedPrefabs = new Dictionary<string, TUI>();
         private readonly Dictionary<string, UniTaskCompletionSource<TUI>> _pendingPrefabLoads =
@@ -41,6 +43,7 @@ namespace qtLib.UI.UIManager
             var cachedView = Get(uiName);
             if (cachedView)
             {
+                cachedView.PreInit(_rectCanvas);
                 return cachedView;
             }
 
@@ -65,7 +68,7 @@ namespace qtLib.UI.UIManager
                 {
                     _uiElements.Remove(name);
                 }
-                else if (!cachedView.isActive)
+                else if (!cachedView.IsActive)
                 {
                     return cachedView;
                 }
@@ -82,7 +85,7 @@ namespace qtLib.UI.UIManager
                     continue;
                 }
 
-                if (!candidate.isActive && string.Equals(candidate.name, name, StringComparison.Ordinal))
+                if (!candidate.IsActive && string.Equals(candidate.name, name, StringComparison.Ordinal))
                 {
                     Add(name, candidate);
                     return candidate;
@@ -265,7 +268,7 @@ namespace qtLib.UI.UIManager
 
             var view = Instantiate(prefab, transform);
             view.gameObject.SetActive(false);
-            view.PreInit();
+            view.PreInit(_rectCanvas);
 
             await UniTask.Yield();
 
