@@ -1,6 +1,6 @@
 {
   "name": "com.qtdino.qtlib",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "displayName": "QT Lib",
   "description": "QT utility library",
   "dependencies": {
