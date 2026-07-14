@@ -1,27 +1,70 @@
-﻿using System.Diagnostics;
-using Debug = UnityEngine.Debug;
+﻿using System;
+using System.Diagnostics;
+using UnityEngine;
 
 namespace qtLib.Helper
 {
     public static class qtDebug
     {
-        private static string Tag = "qtLog";
         [Conditional("ENABLE_LOG")]
-        public static void Log(object msg)
+        public static void Log(
+            object message,
+            UnityEngine.Object context = null)
         {
-            Debug.unityLogger.Log(Tag, msg);
+            Log(LogType.Log, message, context);
         }
 
         [Conditional("ENABLE_LOG")]
-        public static void LogError(object msg)
+        public static void Warning(
+            string message,
+            UnityEngine.Object context = null)
         {
-            Debug.unityLogger.LogError(Tag, msg);
+            Log(LogType.Warning, message, context);
         }
 
         [Conditional("ENABLE_LOG")]
-        public static void LogWarning(object msg)
+        public static void Error(
+            string message,
+            UnityEngine.Object context = null)
         {
-            Debug.unityLogger.LogWarning(Tag, msg);
+            Log(LogType.Warning, message, context);
+        }
+        
+        [Conditional("ENABLE_LOG")]
+        public static void Log(
+            LogType type,
+            object message,
+            UnityEngine.Object context = null)
+        {
+            StackFrame frame = new StackFrame(1);
+            var method = frame.GetMethod();
+
+            string className = method?.DeclaringType?.Name ?? "UnknownClass";
+            string functionName = method?.Name ?? "UnknownFunction";
+
+            string log = $"[{className}.{functionName}] {message}";
+            switch (type)
+            {
+                case LogType.Log:
+                {
+                    UnityEngine.Debug.unityLogger.Log(log, context);
+                    break;
+                }                
+                case LogType.Warning:
+                {
+                    UnityEngine.Debug.LogWarning(log, context);
+                    break;
+                }
+                case LogType.Error:
+                {
+                    UnityEngine.Debug.LogError(log, context);
+                    break;
+                }
+                default:
+                {
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                }
+            }
         }
     }
 }
