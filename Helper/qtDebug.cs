@@ -6,6 +6,7 @@ namespace qtLib.Helper
 {
     public static class qtDebug
     {
+        [HideInCallstack]
         [Conditional("ENABLE_LOG")]
         public static void Log(
             object message,
@@ -13,7 +14,8 @@ namespace qtLib.Helper
         {
             Log(LogType.Log, message, context);
         }
-
+        
+        [HideInCallstack]
         [Conditional("ENABLE_LOG")]
         public static void Warning(
             string message,
@@ -22,6 +24,7 @@ namespace qtLib.Helper
             Log(LogType.Warning, message, context);
         }
 
+        [HideInCallstack]
         [Conditional("ENABLE_LOG")]
         public static void Error(
             string message,
@@ -30,6 +33,7 @@ namespace qtLib.Helper
             Log(LogType.Warning, message, context);
         }
         
+        [HideInCallstack]
         [Conditional("ENABLE_LOG")]
         public static void Log(
             LogType type,
