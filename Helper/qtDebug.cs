@@ -17,7 +17,7 @@ namespace qtLib.Helper
         
         [HideInCallstack]
         [Conditional("ENABLE_LOG")]
-        public static void Warning(
+        public static void LogWarning(
             string message,
             UnityEngine.Object context = null)
         {
@@ -26,7 +26,7 @@ namespace qtLib.Helper
 
         [HideInCallstack]
         [Conditional("ENABLE_LOG")]
-        public static void Error(
+        public static void LogError(
             string message,
             UnityEngine.Object context = null)
         {
