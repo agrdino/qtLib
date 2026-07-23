@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3f004935587cb824abafb2b9500654ff
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281097
+  packageName: Task List
+  packageVersion: 1.2.3
+  assetPath: Assets/Plugins/FewClicksDev/Core/Packages/packageInfo_AudioInspector.asset
+  uploadId: 951702

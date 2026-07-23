@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 9f2c93c40eb656d45b7d04ecf9a2b47a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281097
+  packageName: Task List
+  packageVersion: 1.2.3
+  assetPath: Assets/Plugins/FewClicksDev/TaskList/Editor/TaskListWindow.cs
+  uploadId: 951702

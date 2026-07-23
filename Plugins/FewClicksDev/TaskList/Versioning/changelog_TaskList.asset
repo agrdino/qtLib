@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1927031082bd6d242a563a9b9237ffe3, type: 3}
+  m_Name: changelog_TaskList
+  m_EditorClassIdentifier: 
+  packageInformation: {fileID: 11400000, guid: 065ff23c73d455040be04d16cf0b7689, type: 2}
+  versions:
+  - currentVersion:
+      Major: 1
+      Minor: 2
+      Patch: 3
+    changes:
+    - Added more saving options (manually and on every task change).
+    - Minor fixes in the new task creation process.
+  - currentVersion:
+      Major: 1
+      Minor: 2
+      Patch: 2
+    changes:
+    - Added the 'Edit label' option to the context menu to rename tasks without expanding
+      them.
+    - New tasks are now automatically in the edit mode for a faster creation process.
+  - currentVersion:
+      Major: 1
+      Minor: 2
+      Patch: 1
+    changes:
+    - Added 'Show creation date' flag to the preferences.
+    - Added different 'Closed taks' visualization types.
+  - currentVersion:
+      Major: 1
+      Minor: 2
+      Patch: 0
+    changes:
+    - Added 'Add tasks from TODO comments' functionality.
+    - Fixed preferences not saving correctly.
+    - Added quick access to the online documentation and review button.
+    - Compatibility fixes with other FewClicksDev tools.
+  - currentVersion:
+      Major: 1
+      Minor: 1
+      Patch: 3
+    changes:
+    - Added a 'Keep closed tasks separately' flag to the settings.
+  - currentVersion:
+      Major: 1
+      Minor: 1
+      Patch: 2
+    changes:
+    - Added a scene game object context type with scene loading and object ping.
+  - currentVersion:
+      Major: 1
+      Minor: 1
+      Patch: 1
+    changes:
+    - Added hyperlink context type to the task to open web browser links.
+  - currentVersion:
+      Major: 1
+      Minor: 1
+      Patch: 0
+    changes:
+    - Added an option to export and import lists of tasks so they can be moved between
+      the different machines.
+    - Added a popup before deleting the tasks to make sure that's the intended action.
+    - Added an option to sort tasks based on the custom order.
+  - currentVersion:
+      Major: 1
+      Minor: 0
+      Patch: 0
+    changes:
+    - Initial release.

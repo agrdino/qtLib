@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2b7c010bee598064aa73a2a8b858d187
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281097
+  packageName: Task List
+  packageVersion: 1.2.3
+  assetPath: Assets/Plugins/FewClicksDev/TaskList/Editor/TaskListGenericMenu.cs
+  uploadId: 951702

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8dd5f1336a02c7648b90e34e92e641c4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281097
+  packageName: Task List
+  packageVersion: 1.2.3
+  assetPath: Assets/Plugins/FewClicksDev/Core/Editor/Versioning/ChangelogEditor.cs
+  uploadId: 951702

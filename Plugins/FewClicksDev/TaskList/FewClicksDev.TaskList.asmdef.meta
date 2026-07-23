@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ba012306352f61a47aed00e9fcf27e40
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281097
+  packageName: Task List
+  packageVersion: 1.2.3
+  assetPath: Assets/Plugins/FewClicksDev/TaskList/FewClicksDev.TaskList.asmdef
+  uploadId: 951702

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: cc2cc5ff89234974197b229ac56ce4aa
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281097
+  packageName: Task List
+  packageVersion: 1.2.3
+  assetPath: Assets/Plugins/FewClicksDev/Core/Editor/SelectableList/SelectableList.cs
+  uploadId: 951702

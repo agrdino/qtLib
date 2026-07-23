@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 3c143d85b13d31e418d96c88857fb18a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281097
+  packageName: Task List
+  packageVersion: 1.2.3
+  assetPath: Assets/Plugins/FewClicksDev/Core/Editor/Versioning/Date.cs
+  uploadId: 951702
