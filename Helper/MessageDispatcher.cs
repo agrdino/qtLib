@@ -8,7 +8,7 @@ namespace qtLib.Helper
     {
         #region ----- Component Config -----
 
-        private static Dictionary<EEvent, List<Action<MessageObject>>> _dictListener;
+        private static Dictionary<int, List<Action<MessageObject>>> _dictListener;
 
         #endregion
 
@@ -16,34 +16,34 @@ namespace qtLib.Helper
 
         private void Awake()
         {
-            _dictListener = new Dictionary<EEvent, List<Action<MessageObject>>>();
+            _dictListener = new Dictionary<int, List<Action<MessageObject>>>();
         }
         
         #endregion
         
         #region ----- Public Function -----
 
-        public static void Register(EEvent @event, Action<MessageObject> listener)
+        public static void Register(int eventID, Action<MessageObject> listener)
         {
-            if (!_dictListener.ContainsKey(@event))
+            if (!_dictListener.ContainsKey(eventID))
             {
-                _dictListener.Add(@event, new List<Action<MessageObject>>());
+                _dictListener.Add(eventID, new List<Action<MessageObject>>());
             }
 
-            _dictListener[@event].Add(listener);
+            _dictListener[eventID].Add(listener);
         }
 
-        public static void UnRegister(EEvent @event, Action<MessageObject> listener)
+        public static void UnRegister(int eventID, Action<MessageObject> listener)
         {
-            if (_dictListener.ContainsKey(@event))
+            if (_dictListener.ContainsKey(eventID))
             {
-                _dictListener[@event].Remove(listener);
+                _dictListener[eventID].Remove(listener);
             }
         }
 
-        public static void SendMessage(EEvent @event, MessageObject param = null)
+        public static void SendMessage(int eventID, MessageObject param = null)
         {
-            if (_dictListener.TryGetValue(@event, out var listeners))
+            if (_dictListener.TryGetValue(eventID, out var listeners))
             {
                 foreach (Action<MessageObject> listener in listeners)
                 {
@@ -57,6 +57,11 @@ namespace qtLib.Helper
         public class MessageObject
         {
             
+        }
+        
+        public static partial class EventID
+        {
+            public const int None = 0;
         }
     }
 }

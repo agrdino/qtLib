@@ -239,7 +239,7 @@ namespace qtLib.Editor
  
             var sb = new System.Text.StringBuilder();
             sb.AppendLine("using UnityEngine;");
-            sb.AppendLine("using qtLib.UI.Base;");
+            sb.AppendLine("using qtLib.UI.UIManager;");
             sb.AppendLine();
             sb.AppendLine($"namespace _Scripts.UI.{Suffix()}.{cls}");
             sb.AppendLine("{");
@@ -284,7 +284,7 @@ namespace qtLib.Editor
             string medBase = MediatorBase();
 
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine("using qtLib.UI.Base;");
+            sb.AppendLine("using qtLib.UI.UIManager;");
             sb.AppendLine("using Cysharp.Threading.Tasks;");
             sb.AppendLine();
             sb.AppendLine($"namespace _Scripts.UI.{Suffix()}.{view}");

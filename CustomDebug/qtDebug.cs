@@ -18,7 +18,7 @@ namespace qtLib.CustomDebug
         [HideInCallstack]
         [Conditional("ENABLE_CUSTOM_DEBUG")]
         public static void LogWarning(
-            string message,
+            object message,
             UnityEngine.Object context = null)
         {
             Log(LogType.Warning, message, context);
@@ -27,10 +27,10 @@ namespace qtLib.CustomDebug
         [HideInCallstack]
         [Conditional("ENABLE_CUSTOM_DEBUG")]
         public static void LogError(
-            string message,
+            object message,
             UnityEngine.Object context = null)
         {
-            Log(LogType.Warning, message, context);
+            Log(LogType.Error, message, context);
         }
         
         [HideInCallstack]

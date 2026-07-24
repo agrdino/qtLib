@@ -8,7 +8,6 @@ namespace qtLib.UI.UIManager
     public class qtPopupMediator : MonoBehaviour
     {
         private UILoader _viewLoader;
-
         protected qtUiManager UiManager => qtDependencyInjection.Get<qtUiManager>();
 
         protected virtual void Awake()
